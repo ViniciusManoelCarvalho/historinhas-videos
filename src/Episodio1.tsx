@@ -57,7 +57,6 @@ interface FigureProps {
   skin?: string;
   silhouette?: boolean;
   waveDeg?: number;
-  talking?: boolean;
 }
 
 // Personagem 2D em SVG (viewBox 200x300, pés em y=300)
@@ -71,7 +70,6 @@ const Figure: React.FC<FigureProps> = ({
   skin = "#ffd7a8",
   silhouette = false,
   waveDeg = 0,
-  talking = false,
 }) => {
   const f = useCurrentFrame();
   const ws = Math.sin(f / 5) * 28 * walk;
@@ -84,7 +82,6 @@ const Figure: React.FC<FigureProps> = ({
   const sw = sh ? 0 : 8;
   const HAIR = "#4e342e";
   const rightArmRot = waveDeg !== 0 ? waveDeg : -ws;
-  const mouthOpen = talking && Math.floor(f / 4) % 2 === 0;
 
   const limb = (x1: number, y1: number, x2: number, y2: number, color: string, width: number) => (
     <>
@@ -100,15 +97,15 @@ const Figure: React.FC<FigureProps> = ({
       ? ["M 66 50 Q 80 40 94 50", "M 106 50 Q 120 40 134 50"]
       : ["M 66 56 Q 80 60 94 50", "M 106 50 Q 120 60 134 56"];
 
-  const mouth = mouthOpen ? (
-    <ellipse cx={100} cy={118} rx={14} ry={11} fill="#c0392b" stroke={OUT} strokeWidth={5} />
-  ) : mood === "happy" ? (
-    <path d="M 78 110 Q 100 136 122 110 Z" fill="#c0392b" stroke={OUT} strokeWidth={5} />
-  ) : mood === "surprised" ? (
-    <ellipse cx={100} cy={118} rx={10} ry={13} fill="#c0392b" stroke={OUT} strokeWidth={5} />
-  ) : (
-    <path d="M 84 124 Q 100 112 116 124" fill="none" stroke={OUT} strokeWidth={6} strokeLinecap="round" />
-  );
+  // bocas sempre fechadas (a história é narrada)
+  const mouth =
+    mood === "happy" ? (
+      <path d="M 80 112 Q 100 128 120 112" fill="none" stroke={OUT} strokeWidth={6} strokeLinecap="round" />
+    ) : mood === "surprised" ? (
+      <path d="M 90 120 Q 100 114 110 120" fill="none" stroke={OUT} strokeWidth={6} strokeLinecap="round" />
+    ) : (
+      <path d="M 84 124 Q 100 112 116 124" fill="none" stroke={OUT} strokeWidth={6} strokeLinecap="round" />
+    );
 
   return (
     <svg
@@ -295,7 +292,7 @@ const Scene2: React.FC = () => {
     <AbsoluteFill style={{background: SKY}}>
       <Street scroll={f * 5} />
       <Figure x={teoX - 170 - lag} silhouette walk={1} />
-      <Figure {...TEO} x={teoX} walk={1} mood={f < 140 ? "happy" : "worried"} talking={f < 40 || (f >= 140 && f < 180)} />
+      <Figure {...TEO} x={teoX} walk={1} mood={f < 140 ? "happy" : "worried"} />
       <Sequence from={0} durationInFrames={140}>
         <Caption text="Tô andando tranquilo..." speaker="Teo" />
       </Sequence>
@@ -315,8 +312,8 @@ const Scene3: React.FC = () => {
     <AbsoluteFill style={{background: SKY}}>
       <Street scroll={1200} />
       <Figure x={shadowX} silhouette walk={f < 110 ? 1.4 : 0} />
-      <Figure {...TEO} x={X_TEO} mood={f < 110 ? "surprised" : "happy"} talking={f < 30 || (f >= 60 && f < 100)} />
-      <Figure {...LIA} x={liaX} walk={f >= 20 && f < 125 ? 1 : 0} talking={f >= 130 && f < 180} />
+      <Figure {...TEO} x={X_TEO} mood={f < 110 ? "surprised" : "happy"} />
+      <Figure {...LIA} x={liaX} walk={f >= 20 && f < 125 ? 1 : 0} />
       <Sequence from={0} durationInFrames={60}>
         <Caption text="Olha lá! Ela tá vindo..." speaker="Teo" />
       </Sequence>
@@ -340,8 +337,8 @@ const Scene4: React.FC = () => {
     <AbsoluteFill style={{background: SKY}}>
       <Street scroll={scroll} />
       <Figure x={X_SHADOW} silhouette walk={walking ? 1 : 0} waveDeg={waveDeg} />
-      <Figure {...TEO} x={X_TEO} walk={walking ? 1 : 0} mood={f >= 150 ? "surprised" : "happy"} talking={(f >= 90 && f < 130) || (f >= 150 && f < 190)} />
-      <Figure {...LIA} x={X_LIA} walk={walking ? 1 : 0} mood={f >= 150 ? "surprised" : "happy"} talking={f < 50} />
+      <Figure {...TEO} x={X_TEO} walk={walking ? 1 : 0} mood={f >= 150 ? "surprised" : "happy"} />
+      <Figure {...LIA} x={X_LIA} walk={walking ? 1 : 0} mood={f >= 150 ? "surprised" : "happy"} />
       <Sequence from={0} durationInFrames={90}>
         <Caption text="Vamos pro parque? Tem um relógio sem ponteiros lá." speaker="Lia" />
       </Sequence>
